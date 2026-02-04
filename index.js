@@ -6,10 +6,13 @@
 // 5. Routes
 // 6. Server Startup (app.listen)
 // ==========================================================
+// bF1UIbrraXyZLLen
 
 // 1
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 
 // 2
 const app = express();
@@ -20,6 +23,46 @@ app.use(cors());
 app.use(express.json());
 
 // 4
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.89rnkti.mongodb.net/?appName=Cluster0`;
+// console.log(process.env.DB_USER);
+// console.log(process.env.DB_PASSWORD);
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+
+    // Define Database and Collection AFTER connecting
+    const database = client.db("gadgetsDb");
+    const gadgetsCollection = database.collection("gadgetsColl");
+
+    // === post/create method ===
+    app.post("/createProduct", async (req, res) => {
+      const doc = req.body;
+      const result = await gadgetsCollection.insertOne(doc);
+      res.send(result);
+    });
+
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!",
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+run();
 
 // 5
 app.get("/", (req, res) => {
