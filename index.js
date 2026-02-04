@@ -6,7 +6,6 @@
 // 5. Routes
 // 6. Server Startup (app.listen)
 // ==========================================================
-// bF1UIbrraXyZLLen
 
 // 1
 require("dotenv").config();
@@ -60,10 +59,28 @@ async function run() {
       res.send(result);
     });
 
-    // === post/create method ===
+    // === post/create one product method ===
     app.post("/createProduct", async (req, res) => {
       const doc = req.body;
       const result = await gadgetsCollection.insertOne(doc);
+      res.send(result);
+    });
+
+    // === put/update one product method ===
+    app.put("/updateProduct/:id", async (req, res) => {
+      const query = { _id: new ObjectId(req.params.id) };
+      const update = {
+        $set: {
+          name: req.body.name,
+          brand: req.body.brand,
+          price: req.body.price,
+          image: req.body.image,
+          type: req.body.type,
+          rating: req.body.rating,
+        },
+      };
+      const options = {};
+      const result = await gadgetsCollection.updateOne(query, update, options);
       res.send(result);
     });
 
