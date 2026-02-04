@@ -12,7 +12,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 // 2
 const app = express();
@@ -45,6 +45,20 @@ async function run() {
     // Define Database and Collection AFTER connecting
     const database = client.db("gadgetsDb");
     const gadgetsCollection = database.collection("gadgetsColl");
+
+    // === get/read all products method ===
+    app.get("/products/:email", async (req, res) => {
+      const query = { email: req.params.email };
+      const result = await gadgetsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // === get/read single product method ===
+    app.get("/product/:id", async (req, res) => {
+      const query = { _id: new ObjectId(req.params.id) };
+      const result = await gadgetsCollection.findOne(query);
+      res.send(result);
+    });
 
     // === post/create method ===
     app.post("/createProduct", async (req, res) => {
